@@ -19,10 +19,11 @@ import {
 /* ─── Navigation Items ─── */
 const menuItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Daily Case", href: "/dashboard/daily-case", icon: BriefcaseMedical },
+  { label: "Daily Case", href: "/daily-case", icon: BriefcaseMedical },
   { label: "Chapters", href: "/dashboard/chapters", icon: BookOpen },
   { label: "Community", href: "/dashboard/community", icon: Users },
   { label: "Coin Shop", href: "/dashboard/coin-shop", icon: ShoppingCart },
+  { label: "Redemption", href: "/dashboard/redemption", icon: ShoppingCart },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

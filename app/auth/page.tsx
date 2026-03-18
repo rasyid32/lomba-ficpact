@@ -16,22 +16,10 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const AppleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.53-3.23 0-1.44.66-2.2.47-3.06-.4C3.79 16.17 4.36 9.02 8.7 8.73c1.25.07 2.12.72 2.88.77.96-.2 1.88-.89 2.91-.81 1.23.1 2.16.58 2.78 1.49-2.56 1.53-1.95 4.89.58 5.83-.46 1.22-.7 1.78-1.34 2.84-.66 1.08-1.58 2.42-2.74 2.45l-.72-.02zM12.05 8.63c-.15-2.23 1.66-4.07 3.74-4.25.29 2.56-2.34 4.5-3.74 4.25z" />
-  </svg>
-);
-
-const TwitterIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.3 4.3 0 0 0 1.88-2.38 8.59 8.59 0 0 1-2.72 1.04 4.28 4.28 0 0 0-7.32 3.91A12.16 12.16 0 0 1 3 4.79a4.28 4.28 0 0 0 1.32 5.72 4.24 4.24 0 0 1-1.94-.54v.05a4.28 4.28 0 0 0 3.43 4.19 4.27 4.27 0 0 1-1.93.07 4.29 4.29 0 0 0 4 2.97A8.59 8.59 0 0 1 2 19.54a12.13 12.13 0 0 0 6.56 1.92c7.88 0 12.2-6.53 12.2-12.2 0-.19 0-.37-.01-.56A8.72 8.72 0 0 0 22.46 6z" />
-  </svg>
-);
-
 /* ─── Animation Variants ─── */
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
   exit: { opacity: 0, y: -10, transition: { duration: 0.25 } },
 };
 
@@ -41,40 +29,63 @@ function InputField({
   label,
   type = "text",
   placeholder,
+  value,
+  onChange,
+  error,
 }: {
   id: string;
   label: string;
   type?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-slate-700 mb-1.5">
+      <label htmlFor={id} className="block text-sm font-medium text-slate-700 mb-1.5">      
         {label}
       </label>
       <input
         id={id}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        value={value}
+        onChange={onChange}
+        className={`w-full rounded-lg border ${error ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'} px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20`}
       />
+      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
     </div>
   );
 }
 
-function PasswordField({ id, label }: { id: string; label: string }) {
+function PasswordField({ 
+  id, 
+  label,
+  value,
+  onChange,
+  error 
+}: { 
+  id: string; 
+  label: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+}) {
   const [visible, setVisible] = useState(false);
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-slate-700 mb-1.5">
+      <label htmlFor={id} className="block text-sm font-medium text-slate-700 mb-1.5">      
         {label}
       </label>
       <div className="relative">
         <input
           id={id}
           type={visible ? "text" : "password"}
-          placeholder="Placeholder"
-          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          placeholder="Enter your password"
+          value={value}
+          onChange={onChange}
+          className={`w-full rounded-lg border ${error ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'} px-4 py-2.5 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20`}
         />
         <button
           type="button"
@@ -85,14 +96,18 @@ function PasswordField({ id, label }: { id: string; label: string }) {
           {visible ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
-      <p className="mt-1 text-xs text-slate-400">
-        It must be a combination of minimum 8 letters, numbers, and symbols.
-      </p>
+      {error ? (
+         <p className="mt-1.5 text-xs text-red-500">{error}</p>
+      ) : (
+         <p className="mt-1.5 text-xs text-slate-400">
+           It must be a combination of minimum 8 letters, numbers, and symbols.
+         </p>
+      )}
     </div>
   );
 }
 
-function SSOButtons({ mode }: { mode: "login" | "register" }) {
+function SSOButtons({ mode, onClick }: { mode: "login" | "register", onClick?: () => void }) {
   const label = mode === "login" ? "log in" : "sign up";
   return (
     <div>
@@ -105,24 +120,16 @@ function SSOButtons({ mode }: { mode: "login" | "register" }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { name: "Google", icon: <GoogleIcon /> },
-          { name: "Apple", icon: <AppleIcon /> },
-          { name: "Twitter", icon: <TwitterIcon /> },
-        ].map((provider) => (
-          <motion.button
-            key={provider.name}
-            type="button"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center justify-center gap-2 rounded-lg border-2 border-blue-600 px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
-          >
-            {provider.icon}
-            {provider.name}
-          </motion.button>
-        ))}
-      </div>
+      <motion.button
+        type="button"
+        onClick={onClick}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
+        className="flex w-full items-center justify-center gap-3 rounded-lg border-2 border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:border-slate-300"
+      >
+        <GoogleIcon />
+        Continue with Google
+      </motion.button>
     </div>
   );
 }
@@ -135,6 +142,35 @@ function LoginView({
   onSwitch: () => void;
   onForgot: () => void;
 }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newErrors: { email?: string; password?: string } = {};
+
+    if (!email) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required.";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      window.location.href = '/dashboard';
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = '/dashboard';
+  };
+
   return (
     <motion.div
       key="login"
@@ -148,15 +184,29 @@ function LoginView({
         <p className="mt-2 text-slate-500">Please log in to continue</p>
       </div>
 
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-        <InputField id="login-email" label="Email Address" type="email" placeholder="Placeholder" />
-        <PasswordField id="login-password" label="Password" />
+      <form className="space-y-5" onSubmit={handleLogin}>
+        <InputField 
+          id="login-email" 
+          label="Email Address" 
+          type="email" 
+          placeholder="Enter your email" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={errors.email}
+        />
+        <PasswordField 
+          id="login-password" 
+          label="Password" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password}
+        />
 
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
-              className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" 
             />
             <span className="text-sm text-slate-600">Remember me</span>
           </label>
@@ -173,20 +223,20 @@ function LoginView({
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50" 
         >
           Log In
         </motion.button>
       </form>
 
-      <SSOButtons mode="login" />
+      <SSOButtons mode="login" onClick={handleGoogleLogin} />
 
       <p className="mt-6 text-center text-sm text-slate-500">
         No account yet?{" "}
         <button
           type="button"
           onClick={onSwitch}
-          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"     
         >
           Sign Up
         </button>
@@ -196,6 +246,47 @@ function LoginView({
 }
 
 function RegisterView({ onSwitch }: { onSwitch: () => void }) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [terms, setTerms] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newErrors: { [key: string]: string } = {};
+
+    if (!firstName) newErrors.firstName = "First name is required.";
+    if (!lastName) newErrors.lastName = "Last name is required.";
+    
+    if (!email) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required.";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters.";
+    }
+
+    if (!terms) {
+      newErrors.terms = "You must agree to the Terms of Service.";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      window.location.href = '/onboarding';
+    }
+  };
+
+  const handleGoogleRegister = () => {
+    window.location.href = '/onboarding';
+  };
+
   return (
     <motion.div
       key="register"
@@ -206,49 +297,82 @@ function RegisterView({ onSwitch }: { onSwitch: () => void }) {
     >
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Sign Up Free</h1>
-        <p className="mt-2 text-slate-500">14 day free access to unlimited resources</p>
+        <p className="mt-2 text-slate-500">14 day free access to unlimited resources</p>    
       </div>
 
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-5" onSubmit={handleRegister}>
         <div className="grid grid-cols-2 gap-4">
-          <InputField id="reg-first" label="First Name" placeholder="Placeholder" />
-          <InputField id="reg-last" label="Last Name" placeholder="Placeholder" />
+          <InputField 
+            id="reg-first" 
+            label="First Name" 
+            placeholder="John" 
+            value={firstName} 
+            onChange={(e) => setFirstName(e.target.value)}
+            error={errors.firstName}
+          />        
+          <InputField 
+            id="reg-last" 
+            label="Last Name" 
+            placeholder="Doe" 
+            value={lastName} 
+            onChange={(e) => setLastName(e.target.value)}
+            error={errors.lastName}
+          />
         </div>
 
-        <InputField id="reg-email" label="Email" type="email" placeholder="Placeholder" />
-        <PasswordField id="reg-password" label="Password" />
+        <InputField 
+          id="reg-email" 
+          label="Email Address" 
+          type="email" 
+          placeholder="john@example.com" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={errors.email}
+        />  
+        <PasswordField 
+          id="reg-password" 
+          label="Password" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password}
+        />
 
-        <label className="flex items-start gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
-          <span className="text-sm text-slate-600">
-            I agree to the{" "}
-            <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>{" "}
-            and{" "}
-            <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
-          </span>
-        </label>
+        <div>
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={terms}
+              onChange={(e) => setTerms(e.target.checked)}
+              className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-slate-600">
+              I agree to the{" "}
+              <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>{" "} 
+              and{" "}
+              <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.       
+            </span>
+          </label>
+          {errors.terms && <p className="mt-1 text-xs text-red-500">{errors.terms}</p>}
+        </div>
 
         <motion.button
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50" 
         >
           Sign Up
         </motion.button>
       </form>
 
-      <SSOButtons mode="register" />
+      <SSOButtons mode="register" onClick={handleGoogleRegister} />
 
       <p className="mt-6 text-center text-sm text-slate-500">
         Already have an account?{" "}
         <button
           type="button"
           onClick={onSwitch}
-          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+          className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"     
         >
           Log In
         </button>

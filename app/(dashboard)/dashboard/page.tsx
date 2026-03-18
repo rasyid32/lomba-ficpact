@@ -16,7 +16,7 @@ function FeatureCard({
       <h2 className="text-lg font-bold text-gray-900 mb-4">{title}</h2>
 
       {/* Image placeholder */}
-      <div className="flex aspect-[4/3] items-center justify-center rounded-xl bg-gray-100">
+      <div className="flex aspect-4/3 items-center justify-center rounded-xl bg-gray-100">
         <svg
           width="64"
           height="64"
@@ -61,8 +61,9 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
         <FeatureCard
           title="Daily Case"
-          description="Sharpen your skills with a new real-world case every day. Solve challenges and earn XP to climb the leaderboard."
-          href="/dashboard/daily-case"
+          description="Sharpen your skills with a new real-world case every day. Solve challenges and earn XP
+ to climb the leaderboard."
+          href="/daily-case"
         />
         <FeatureCard
           title="Personal Learning Path AI"

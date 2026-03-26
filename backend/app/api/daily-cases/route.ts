@@ -3,17 +3,25 @@ import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Gunakan offset manual untuk menggeser waktu UTC menjadi WIB (UTC+7)
+    // agar sinkron antara server Vercel dan lokal.
+    const now = new Date();
+    // Offset WIB adalah +7 jam dari UTC
+    const offset = 7 * 60 * 60 * 1000; 
+    const cNow = new Date(now.getTime() + offset);
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Buat objek 'today' (jam 00:00:00 WIB)
+    const today = new Date(Date.UTC(cNow.getUTCFullYear(), cNow.getUTCMonth(), cNow.getUTCDate(), 0, 0, 0));
+    // Reset kembali ke UTC dengan mengurangkan offset, karena database menyimpan dalam UTC
+    const todayUTC = new Date(today.getTime() - offset);
+
+    const tomorrowUTC = new Date(todayUTC.getTime() + 24 * 60 * 60 * 1000);
 
     let dailyCase = await db.dailyCase.findFirst({
       where: {
         date: {
-          gte: today,
-          lt: tomorrow
+          gte: todayUTC,
+          lt: tomorrowUTC
         }
       },
       include: {
@@ -46,7 +54,7 @@ export async function GET(req: NextRequest) {
       if (randomChapter) {
         dailyCase = await db.dailyCase.create({
           data: {
-            date: today,
+            date: todayUTC,
             chapterId: randomChapter.id,
             xpReward: 200,
             coinReward: 100,

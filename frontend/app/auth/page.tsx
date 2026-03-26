@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -278,7 +278,9 @@ function ForgotView({ onBack }: { onBack: () => void }) {
 
 /* ─── Main Page ─── */
 export default function AuthPage() {
-  const [view, setView] = useState<AuthView>("login");
+  const searchParams = useSearchParams();
+  const modeParam = searchParams.get("mode") as AuthView | null;
+  const [view, setView] = useState<AuthView>(modeParam || "login");
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">

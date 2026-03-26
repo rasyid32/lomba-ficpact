@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -276,8 +276,8 @@ function ForgotView({ onBack }: { onBack: () => void }) {
   );
 }
 
-/* ─── Main Page ─── */
-export default function AuthPage() {
+/* ─── Main Content Component (Extracted) ─── */
+function AuthContent() {
   const searchParams = useSearchParams();
   const modeParam = searchParams.get("mode") as AuthView | null;
   const [view, setView] = useState<AuthView>(modeParam || "login");
@@ -297,5 +297,18 @@ export default function AuthPage() {
         </AnimatePresence>
       </motion.div>
     </main>
+  );
+}
+
+/* ─── Main Page (Wrapped in Suspense) ─── */
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-blue-600" size={32} />
+      </div>
+    }>
+      <AuthContent />
+    </Suspense>
   );
 }

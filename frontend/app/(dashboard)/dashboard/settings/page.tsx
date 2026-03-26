@@ -13,7 +13,7 @@ export default function SettingsPage() {
   
   // Profile State
   const [fullName, setFullName] = useState(user?.fullName || "");
-  const [bio, setBio] = useState(user?.bio || "");
+  const [bio, setBio] = useState((user as any)?.bio || "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
 

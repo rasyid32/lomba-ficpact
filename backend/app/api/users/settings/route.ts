@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest) {
       updateData.darkThemeEnabled = darkThemeEnabled;
     }
 
-    const updated = await prisma.user.update({
+    const updated = await db.user.update({
       where: { id: user.id },
       data: updateData,
       select: { 

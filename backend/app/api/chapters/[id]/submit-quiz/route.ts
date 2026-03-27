@@ -35,6 +35,20 @@ export async function POST(
     if (!chapter) return NextResponse.json({ error: 'Chapter not found' }, { status: 404 });
 
     const isPerfect = score === 100;
+
+    // Check if user already got a perfect score (reward already claimed)
+    const previousPerfect = await db.submission.findFirst({
+      where: {
+        userId: payload.id,
+        chapterId: unwrappedParams.id,
+        language: 'quiz',
+        status: 'ACCEPTED'
+      }
+    });
+    const alreadyClaimed = !!previousPerfect;
+
+    // Only award XP/coins on FIRST perfect score
+    const shouldReward = isPerfect && !alreadyClaimed;
     
     // Create submission record
     await db.submission.create({
@@ -44,25 +58,28 @@ export async function POST(
         code: JSON.stringify({ score }),
         language: 'quiz',
         status: isPerfect ? 'ACCEPTED' : 'REJECTED',
-        xpEarned: isPerfect ? 1000 : 0,
-        coinsEarned: isPerfect ? 500 : 0,
+        xpEarned: shouldReward ? 1000 : 0,
+        coinsEarned: shouldReward ? 500 : 0,
         passedTests: isPerfect ? 5 : 0,
         totalTests: 5
       }
     });
 
     if (isPerfect) {
-      // Award user
-      await db.user.update({
-        where: { id: payload.id },
-        data: {
-          xp: { increment: 1000 },
-          coins: { increment: 500 }
-        }
-      });
-      return NextResponse.json({ success: true, message: 'Skor sempurna! Mendapatkan 1000 XP dan 500 Coins.', cooldownRemaining: 0 });
+      if (shouldReward) {
+        await db.user.update({
+          where: { id: payload.id },
+          data: {
+            xp: { increment: 1000 },
+            coins: { increment: 500 }
+          }
+        });
+        return NextResponse.json({ success: true, message: 'Skor sempurna! Mendapatkan 1000 XP dan 500 Coins.', rewardClaimed: false, cooldownRemaining: 0 });
+      } else {
+        return NextResponse.json({ success: true, message: 'Skor sempurna!', rewardClaimed: true, cooldownRemaining: 0 });
+      }
     } else {
-      return NextResponse.json({ success: false, message: 'Jawaban salah terdeteksi. Silakan coba kembali setelah 30 menit.', cooldownRemaining: 30 * 60 * 1000 });
+      return NextResponse.json({ success: false, message: 'Jawaban salah terdeteksi. Silakan coba kembali setelah 30 menit.', rewardClaimed: alreadyClaimed, cooldownRemaining: 30 * 60 * 1000 });
     }
 
   } catch (error) {

@@ -23,19 +23,30 @@ export async function GET(
       orderBy: { createdAt: 'desc' }
     });
 
+    // Check if user already got a perfect score before (reward already claimed)
+    const previousPerfect = await db.submission.findFirst({
+      where: {
+        userId: payload.id,
+        chapterId: unwrappedParams.id,
+        language: 'quiz',
+        status: 'ACCEPTED'
+      }
+    });
+    const rewardClaimed = !!previousPerfect;
+
     if (!latestSubmission) {
-      return NextResponse.json({ canAttempt: true, cooldownRemaining: 0 });
+      return NextResponse.json({ canAttempt: true, cooldownRemaining: 0, rewardClaimed });
     }
 
     if (latestSubmission.status === 'REJECTED') {
       const timeDiff = Date.now() - new Date(latestSubmission.createdAt).getTime();
       const cooldownMs = 30 * 60 * 1000;
       if (timeDiff < cooldownMs) {
-        return NextResponse.json({ canAttempt: false, cooldownRemaining: cooldownMs - timeDiff });
+        return NextResponse.json({ canAttempt: false, cooldownRemaining: cooldownMs - timeDiff, rewardClaimed });
       }
     }
 
-    return NextResponse.json({ canAttempt: true, cooldownRemaining: 0 });
+    return NextResponse.json({ canAttempt: true, cooldownRemaining: 0, rewardClaimed });
   } catch (error) {
     console.error('Quiz status error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -89,7 +89,7 @@ export const chaptersAPI = {
   getQuizStatus: (id: string) =>
     fetchAPI<{ canAttempt: boolean; cooldownRemaining: number }>(`/chapters/${id}/quiz-status`),
   submitQuiz: (id: string, score: number) =>
-    fetchAPI<{ success: boolean; message: string; cooldownRemaining: number; error?: string }>(`/chapters/${id}/submit-quiz`, {
+    fetchAPI<{ success: boolean; message: string; cooldownRemaining: number; rewardClaimed?: boolean; error?: string }>(`/chapters/${id}/submit-quiz`, {
       method: "POST",
       body: JSON.stringify({ score }),
     }),

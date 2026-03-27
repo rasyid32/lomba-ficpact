@@ -228,13 +228,11 @@ export default function ChapterDetailPage({ params }: { params: Promise<{ id: st
                                   <div className="space-y-3">
                                     {q.options.map((opt, oIdx) => {
                                       const isSelected = quizAnswers[qIdx] === oIdx;
-                                      const isOptionCorrect = q.correctIdx === oIdx;
                                       let btnStyle = "border-slate-200 text-slate-700 hover:bg-slate-50";
                                       if (isSelected && !showResult) btnStyle = "border-blue-500 bg-blue-50 text-blue-800 ring-1 ring-blue-500";
-                                      if (showResult) {
-                                        if (isOptionCorrect) btnStyle = "border-green-500 bg-green-100 text-green-800 font-semibold";
-                                        else if (isSelected) btnStyle = "border-red-500 bg-red-100 text-red-800";
-                                        else btnStyle = "border-slate-200 opacity-60";
+                                      if (showResult && isSelected) {
+                                        if (quizAnswers[qIdx] === q.correctIdx) btnStyle = "border-green-500 bg-green-100 text-green-800 font-semibold";
+                                        else btnStyle = "border-red-500 bg-red-100 text-red-800";
                                       }
                                       return (
                                         <button

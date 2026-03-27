@@ -7,6 +7,7 @@ import { ArrowLeft, CheckCircle, XCircle, ChevronRight, ChevronLeft, BookOpen, S
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { chaptersAPI } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 import { getChapterData } from "./content";
 
 const CHAPTER_ORDER: Record<string, string[]> = {
@@ -19,6 +20,7 @@ export default function ChapterDetailPage({ params }: { params: Promise<{ id: st
   const unwrappedParams = React.use(params);
   const chapterId = unwrappedParams.id;
   const router = useRouter();
+  const { refreshUser } = useAuth();
 
   const [chapter, setChapter] = useState<any>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -134,6 +136,9 @@ export default function ChapterDetailPage({ params }: { params: Promise<{ id: st
         setCooldownTime(res.cooldownRemaining);
       }
       if (res.rewardClaimed !== undefined) setRewardClaimed(res.rewardClaimed);
+
+      // Refresh user data to update XP/coins in sidebar
+      await refreshUser();
     } catch (err: any) {
       alert(err.message || "Terjadi kesalahan server");
     } finally {
